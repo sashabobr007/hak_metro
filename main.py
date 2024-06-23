@@ -218,6 +218,9 @@ async def change_status (id_bid: str, status : str, db: Session = Depends(get_db
         if requests:
             requests.status = status
             db.commit()
+            algos()
+            to_bd_move()
+            to_bd_obed()
             return JSONResponse(
                 status_code=200,
                 content={"message": "Запись успешно обновлена."}
@@ -242,6 +245,9 @@ async def change_status (id_bid: str, time_perenos : str, db: Session = Depends(
             requests.time_perenos = time_perenos
             db.commit()
             db.close()
+            algos()
+            to_bd_move()
+            to_bd_obed()
             return JSONResponse(
                 status_code=200,
                 content={"message": "Запись успешно обновлена."}
@@ -284,6 +290,9 @@ async def add_request(request_data: RequestData, db: Session = Depends(get_db)):
         new_request = Request(**request_data.dict())
         db.add(new_request)
         db.commit()
+        algos()
+        to_bd_move()
+        to_bd_obed()
         return JSONResponse(content={"message": "Заявка успешно добавлена."})
     except IntegrityError:
         db.rollback()
