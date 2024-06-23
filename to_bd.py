@@ -5,8 +5,8 @@ from models import *
 import random
 
 
-conn = psycopg2.connect(database='metro', user='aleksandralekseev', host='localhost', password='')
-#conn = psycopg2.connect(database='metro', user='postgres', host='localhost', password='1712')
+#conn = psycopg2.connect(database='metro', user='aleksandralekseev', host='localhost', password='')
+conn = psycopg2.connect(database='metro', user='postgres', host='localhost', password='1712')
 
 
 def to_bd_passengers():
