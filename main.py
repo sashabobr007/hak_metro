@@ -110,6 +110,7 @@ async def get_items(db: Session = Depends(get_db)):
     return db.query(NameStations).all()
 
 
+
 @app.get("/pas_info_surnames/")
 async def get_items(db: Session = Depends(get_db)):
     return db.query(Passengers).all()
