@@ -98,7 +98,6 @@ async def protected_route(current_user: User = Depends(get_current_user)):
     return {"message": f"Привет, {current_user.username}!", "user_data": current_user}
 
 
-
 @app.delete("/algos_dont_tap/")
 async def get_items():
     algos()
@@ -108,7 +107,6 @@ async def get_items():
 @app.get("/stations/")
 async def get_items(db: Session = Depends(get_db)):
     return db.query(NameStations).all()
-
 
 
 @app.get("/pas_info_surnames/")
@@ -301,38 +299,15 @@ async def add_request(fio : str, cat_pas : str, phone : str, telegram : str, db:
         raise HTTPException(status_code=500, detail=f"Ошибка при добавлении: {e}")
 
 
-#
-# # 8. Создаём эндпоинт для получения элемента по ID
-# @app.get("/items/{item_id}", response_model=Item)
-# async def get_item(item_id: int, db: Session = Depends(get_db)):
-#     db_item = db.query(Item).filter(Item.id == item_id).first()
-#     if db_item is None:
-#         return JSONResponse(status_code=404, content={"message": "Item not found"})
-#     return db_item
-#
-# # 9. Создаём эндпоинт для обновления элемента
-# @app.put("/items/{item_id}", response_model=Item)
-# async def update_item(item_id: int, item: ItemCreate, db: Session = Depends(get_db)):
-#     db_item = db.query(Item).filter(Item.id == item_id).first()
-#     if db_item is None:
-#         return JSONResponse(status_code=404, content={"message": "Item not found"})
-#     db_item.name = item.name
-#     db_item.description = item.description
-#     db_item.price = item.price
-#     db_item.tax = item.tax
-#     db.commit()
-#     db.refresh(db_item)
-#     return db_item
-#
-# # 10. Создаём эндпоинт для удаления элемента
-# @app.delete("/items/{item_id}")
-# async def delete_item(item_id: int, db: Session = Depends(get_db)):
-#     db_item = db.query(Item).filter(Item.id == item_id).first()
-#     if db_item is None:
-#         return JSONResponse(status_code=404, content={"message": "Item not found"})
-#     db.delete(db_item)
-#     db.commit()
-#     return JSONResponse(status_code=204, content={"message": "Item deleted"})
+@app.delete("/del_task/")
+async def delete_item(id_bid: str, db: Session = Depends(get_db)):
+    db_item = db.query(Request).filter(Request.id_bid == id_bid).first()
+    if db_item is None:
+        return JSONResponse(status_code=404, content={"message": "Item not found"})
+    db.delete(db_item)
+    db.commit()
+    return JSONResponse(status_code=204, content={"message": "Item deleted"})
+
 
 @app.get("/")
 async def root():
