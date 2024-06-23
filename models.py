@@ -75,19 +75,12 @@ class Emergency(Base):
 
 
 class Obed(Base):
-    __tablename__ = "obed"
-    id_bid = Column(String , primary_key=True)
+    __tablename__ = "obed1"
+
     id_worker = Column(String, primary_key=True)
-    st_from = Column(String)
     start_time = Column(String)
-    on_place_time = Column(String)
-    wait_minutes = Column(Integer)
-    time3 = Column(String)
-    name_station1 = Column(String)
-    name_station2 = Column(String)
-    path_minutes = Column(Integer)
-    time4 = Column(String)
-    minutes_to_st1 = Column(Integer)
+    end_time = Column(String)
+
 
 
 

@@ -13,7 +13,8 @@ class Database():
     def get_all(self):
         cursor = self.con.cursor()
         cursor.execute(f"select  * from move join workers on move.id_worker = workers.id_worker join workers_info "
-                       f"on workers_info.id_worker = workers.id_worker join request on  request.id_bid = move.id_bid;")
+                       f"on workers_info.id_worker = workers.id_worker join request on  request.id_bid = move.id_bid "
+                       f"join obed1 on workers_info.id_worker = obed1.id_worker;")
         result = cursor.fetchall()
         temp = []
         for x in result:

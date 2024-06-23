@@ -5,8 +5,8 @@ from models import *
 import random
 
 
-#conn = psycopg2.connect(database='metro', user='aleksandralekseev', host='localhost', password='')
-conn = psycopg2.connect(database='metro', user='postgres', host='localhost', password='1712')
+conn = psycopg2.connect(database='metro', user='aleksandralekseev', host='localhost', password='')
+#conn = psycopg2.connect(database='metro', user='postgres', host='localhost', password='1712')
 
 
 def to_bd_passengers():
@@ -280,46 +280,73 @@ def to_bd_move():
         db.commit()
         db.close()
 
+    # df = pd.read_csv('obed.csv')
+    # cur = conn.cursor()
+    #
+    # cur.execute("delete from obed;")
+    #
+    # conn.commit()
+    # cur.close()
+    #
+    # # Вставляем данные из датафрейма в таблицу базы данных
+    # for index, row in df.iterrows():
+    #     # print(row['id'])
+    #     db = SessionLocal()
+    #
+    #     new_move = Obed(
+    #         id_bid=row["request_id"],
+    #         id_worker=row["worker_id"],
+    #         st_from=row["st1"],
+    #         start_time=row["start_request_time"],
+    #         on_place_time=row["on_place_time"],
+    #         wait_minutes=row["wait_minutes"],
+    #         time3=row["start_time"],
+    #         name_station1=row["st1"],
+    #         name_station2=row["st2"],
+    #         path_minutes=row["path_minutes"],
+    #         time4=row["end_time"],
+    #         minutes_to_st1=row["minutes_to_st1"]
+    #     )
+    #
+    #     db.add(new_move)
+    #     db.commit()
+    #     db.close()
+
+def to_bd_obed():
     df = pd.read_csv('obed.csv')
     cur = conn.cursor()
 
-    cur.execute("delete from obed;")
+    cur.execute("delete from obed1;")
 
     conn.commit()
     cur.close()
 
     # Вставляем данные из датафрейма в таблицу базы данных
     for index, row in df.iterrows():
-        # print(row['id'])
         db = SessionLocal()
 
         new_move = Obed(
-            id_bid=row["request_id"],
             id_worker=row["worker_id"],
-            st_from=row["st1"],
-            start_time=row["start_request_time"],
-            on_place_time=row["on_place_time"],
-            wait_minutes=row["wait_minutes"],
-            time3=row["start_time"],
-            name_station1=row["st1"],
-            name_station2=row["st2"],
-            path_minutes=row["path_minutes"],
-            time4=row["end_time"],
-            minutes_to_st1=row["minutes_to_st1"]
+            start_time=row["start_time"],
+            end_time=row["end_time"]
         )
 
         db.add(new_move)
         db.commit()
         db.close()
+
     conn.close()
 
+
 # if __name__ == '__main__':
-#     #to_bd_request()
-#     #to_bd_workers()
-#     to_bd_name_stations()
-#     #to_bd_passengers()
-#     #to_bd_time_perehod()
-#     #to_bd_workers_info()
-#     #to_bd_time_stations()
+#     to_bd_obed()
+    #to_bd_move()
+    #to_bd_request()
+    # to_bd_workers()
+    # to_bd_name_stations()
+    # to_bd_passengers()
+    # to_bd_time_perehod()
+    # to_bd_workers_info()
+    # to_bd_time_stations()
 
 

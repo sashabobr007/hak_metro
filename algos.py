@@ -3,9 +3,9 @@ import pandas as pd
 import networkx as nx
 from datetime import timedelta, datetime
 from tqdm import tqdm
-
 import warnings
 warnings.filterwarnings('ignore')
+
 
 def algos():
     conn = 'postgresql://postgres:1712@localhost/metro'
@@ -100,8 +100,6 @@ def algos():
 
     workers = pd.concat([day_workers, morning_workers, evening_workers]).drop_duplicates().drop(columns='time_work')
 
-
-
     def get_requests():
         # requests = pd.read_json('Заявки.json').set_index('id')
         requests = pd.read_sql_table(table_name='request', con=conn,
@@ -122,8 +120,6 @@ def algos():
         for col in 'datetime', 'otmena_datetime', 'neyavka_datetime', 'time_perenos':
             requests[col] = pd.to_datetime(requests[col], format='mixed')
 
-        today = requests.iloc[0]['datetime'].date()
-
         # Удаляем все отменённые заявки
         requests = requests[requests.otmena_datetime.isnull()]
 
@@ -131,6 +127,15 @@ def algos():
         make_shift = lambda x: x['time_perenos'] if not pd.isnull(x['time_perenos']) else x['datetime']
         requests['datetime'] = requests.apply(make_shift,
                                               axis=1)
+
+        # Меняем дату на сегодняшнюю
+        today = datetime.now().date()
+        requests['datetime'] = requests['datetime'].map(lambda x: datetime(year=today.year,
+                                                                           month=today.month,
+                                                                           day=today.day,
+                                                                           hour=x.hour,
+                                                                           minute=x.minute,
+                                                                           second=x.second))
 
         calc_path_time = lambda x: timedelta(seconds=get_path(st1=x.id_st1, st2=x.id_st2, alone=False)['time'])
         requests['path_time'] = requests.apply(
@@ -141,8 +146,15 @@ def algos():
         requests['end_time'] = requests.apply(
             lambda x: calc_end_time(x) if pd.isnull(x['neyavka_datetime']) else x['neyavka_datetime'],
             axis=1)
+
         requests.drop(columns=['otmena_datetime', 'neyavka_datetime', 'time_perenos'], inplace=True)
-        return requests[(requests.datetime.dt.date == today)].sort_values('datetime')
+        return requests.sort_values('datetime')
+
+    requests = get_requests()
+    today = requests.iloc[0]['datetime'].date()
+
+    requests = get_requests()
+    today = requests.iloc[0]['datetime'].date()
 
 
     requests = get_requests()
@@ -230,10 +242,15 @@ def algos():
 
     #move
     ts = get_timesheet(requests)
-    obed = ts[ts.index.isin([-1], level=0)]
-    ts = ts[~(ts.index.isin([-1], level=0))]
+    obed = ts.xs(-1, level=0)[['start_request_time', 'end_time']]
+    obed.columns = ['start_time', 'end_time']
+    ts = ts[ts.index.get_level_values(0) != -1]
     obed.to_csv('obed.csv')
     ts.to_csv('ts.csv')
+
+
+
+
 
 
 

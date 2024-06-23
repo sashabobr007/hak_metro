@@ -15,13 +15,25 @@ from schemas import *
 from database import get_db
 from models import *
 from algos import algos
-from to_bd import to_bd_move
+from to_bd import *
 from db import Database
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+#from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from typing import Optional
 from pydantic import BaseModel
+import pandas as pd
+
+def get_worker_info(worker_id, time: str):
+    timesheet = pd.read_csv('ts.csv', sep=',', index_col=[0,1], parse_dates=['start_time', 'on_place_time', 'start_request_time', 'end_time'])
+    time = datetime.strptime(time, '%Y-%m-%d %H:%M:%S')
+    info = timesheet.xs(worker_id, level='worker_id')
+    return {'total_tasks': len(info),
+            'total_completed_tasks': sum(info.end_time <= time),
+            'today_tasks': sum(info.end_time.dt.date == datetime),
+            'time_in_way': info.minutes_to_st1.mean(),
+            'time_in_tasks': info.path_minutes.mean(),
+            'time_free': info.wait_minutes.mean()}
 
 
 app = FastAPI()
@@ -102,6 +114,7 @@ async def protected_route(current_user: User = Depends(get_current_user)):
 async def get_items():
     algos()
     to_bd_move()
+    to_bd_obed()
     return {'m' :'s'}
 
 @app.get("/stations/")
@@ -306,7 +319,14 @@ async def delete_item(id_bid: str, db: Session = Depends(get_db)):
         return JSONResponse(status_code=404, content={"message": "Item not found"})
     db.delete(db_item)
     db.commit()
-    return JSONResponse(status_code=204, content={"message": "Item deleted"})
+    return {"message": "Item deleted"}
+
+
+@app.get("/get_worker_info/")
+async def root(id_worker : int, date : str):
+    return get_worker_info(id_worker, date)
+
+
 
 
 @app.get("/")
