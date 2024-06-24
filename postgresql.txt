@@ -1,0 +1,200 @@
+
+CREATE TABLE IF NOT EXISTS "request" (
+  "id_bid" text NOT NULL UNIQUE,
+  "id_pas" text,
+  "datetime" text,
+  "time3" text,
+  "time4" text,
+  "cat_pas" text,
+  "status" text,
+  "tpz" text,
+  "insp_sex_m" text,
+  "insp_sex_f" text,
+  "time_over" text,
+  "id_st1" text,
+  "id_st2" text,
+  "otmena_datetime" text,
+  "neyavka_datetime" text,
+  "time_perenos" text,
+  "phone" text,
+  "telegram" text,
+  "feedback" text,
+  "place" bigint,
+  "comment" bigint,
+  "obed" bigint,
+  PRIMARY KEY ("id_bid")
+);
+
+
+CREATE TABLE IF NOT EXISTS "workers" (
+  "id_worker" text NOT NULL,
+  "date" text NOT NULL,
+  "time_work" text,
+  "uchastok" text,
+  "smena" text
+);
+
+drop table workers
+
+
+CREATE TABLE IF NOT EXISTS "passengers" (
+  "id_pas" text NOT NULL UNIQUE,
+  "fio" text,
+  "cat_pas" text,
+  "phone" text,
+  "telegram" text,
+  PRIMARY KEY ("id_pas")
+);
+
+CREATE TABLE IF NOT EXISTS "name_stations" (
+  "id_station" text NOT NULL UNIQUE,
+  "name_station" text,
+  "name_line" text,
+  "id_line" text,
+  "coordinate1" text,
+  "coordinate2" text,
+  PRIMARY KEY ("id_station")
+);
+
+CREATE TABLE IF NOT EXISTS "time_stations" (
+  "id_st1" text NOT NULL,
+  "id_st2" text NOT NULL,
+  "time_way" text NOT NULL,
+  PRIMARY KEY ("id_st1", "id_st2")
+);
+
+CREATE TABLE IF NOT EXISTS "time_perehod" (
+  "id_st1" text NOT NULL,
+  "id_st2" text NOT NULL,
+  "time_perehod" text NOT NULL,
+  PRIMARY KEY ("id_st1", "id_st2")
+);
+
+
+
+
+
+CREATE TABLE "workers_info" (
+  "id_worker" text NOT NULL UNIQUE,
+  "fio" text,
+  "rank" text,
+  "sex" text,
+  "mobile_phone" text,
+  "phone_job" text,
+  "tabel_number" text,
+  "health" text,
+  PRIMARY KEY ("id_worker")
+);
+
+
+
+CREATE TABLE IF NOT EXISTS "move" (
+	"id_bid" text NOT NULL,
+	"id_worker" text NOT NULL,
+	"st_from" text,
+	"start_time" text,
+	"on_place_time" text,
+	"wait_minutes" bigint,
+	"time3" text,
+	"name_station1" text,
+	"name_station2" text,
+	"path_minutes" bigint,
+	"time4" text,
+	"minutes_to_st1" bigint,
+	PRIMARY KEY ("id_bid", "id_worker")
+);
+
+
+CREATE TABLE IF NOT EXISTS "obed" (
+	"id_bid" text NOT NULL,
+	"id_worker" text NOT NULL,
+	"st_from" text,
+	"start_time" text,
+	"on_place_time" text,
+	"wait_minutes" bigint,
+	"time3" text,
+	"name_station1" text,
+	"name_station2" text,
+	"path_minutes" bigint,
+	"time4" text,
+	"minutes_to_st1" bigint,
+	PRIMARY KEY ("id_bid", "id_worker")
+);
+
+
+CREATE TABLE IF NOT EXISTS "obed1" (
+	"id_worker" text NOT NULL,
+	"start_time" text,
+	"end_time" text
+)
+
+CREATE TABLE IF NOT EXISTS "emergency" (
+  "id_emergency" bigint NOT NULL UNIQUE,
+  "id_worker" text NOT NULL,
+  "fio_worker" text NOT NULL,
+  "text_emergency" text NOT NULL,
+  "date_emergency" text NOT NULL,
+  PRIMARY KEY ("id_emergency", "id_worker")
+);
+
+
+ALTER TABLE "request" ADD CONSTRAINT "request_fk1" FOREIGN KEY ("id_pas") REFERENCES "passengers"("id_pas");
+
+ALTER TABLE "request" ADD CONSTRAINT "request_fk11" FOREIGN KEY ("id_st1") REFERENCES "name_stations"("id_station");
+
+ALTER TABLE "request" ADD CONSTRAINT "request_fk12" FOREIGN KEY ("id_st2") REFERENCES "name_stations"("id_station");
+
+
+
+ALTER TABLE "move" ADD CONSTRAINT "move_fk0" FOREIGN KEY ("id_bid") REFERENCES "request"("id_bid");
+
+ALTER TABLE "move" ADD CONSTRAINT "move_fk1" FOREIGN KEY ("id_worker") REFERENCES "workers_info"("id_worker");
+
+
+ALTER TABLE request DROP CONSTRAINT request_fk12;
+
+select  * from move;
+
+
+select  * from move join workers on move.id_worker = workers.id_worker join workers_info on  workers_info.id_worker = workers.id_worker join request on  request.id_bid = move.id_bid join obed1 on workers_info.id_worker = obed1.id_worker;
+
+select  * from obed1;
+
+delete from move;
+
+select  * from name_stations;
+
+select  * from workers_info;
+
+select  * from workers_info join workers on workers_info.id_worker = workers.id_worker
+
+select  * from workers;
+
+select  * from request;
+
+
+select count(*) from request;
+
+select  * from request_worker;
+
+select  * from request where id_bid = 'string';
+
+select  * from passengers;
+
+select  * from time_stations;
+
+select  * from time_perehod;
+
+select * from time_stations join name_stations on time_stations.id_st2 = name_stations.id_station
+
+select * from time_stations join name_stations on time_stations.id_st1 = name_stations.id_station where name_stations.id_station = '3'
+
+
+select r.*, m.id_worker, w.fio from request as r join move as m on r.id_bid = m.id_bid
+join workers_info as w on w.id_worker = m.id_worker where r.id_bid = '488871';
+
+
+select m.name_station1 , m.name_station2, n.coordinate1 as p1c1, n.coordinate2 as p1c2, n1.coordinate1 as p2c1, n1.coordinate2 as p2c2  from move as m join name_stations as n on m.name_station1 = n.name_station join name_stations as n1 on m.name_station2 = n1.name_station where id_worker = '142';
+
+
+

@@ -11,3 +11,5 @@
 ```
    docker run -d --name metro -p 8000:8000 metro
 ```
+
+Скрипты бызы данных postgresql лежат в файле postgresq.txt 
