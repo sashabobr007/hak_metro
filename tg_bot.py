@@ -6,6 +6,10 @@ import os
 from dotenv import load_dotenv
 import pandas as pd
 
+conn = 'postgresql://postgres:1712@localhost/metro'
+#conn = 'postgresql://aleksandralekseev:@localhost/metro'
+
+
 
 def tel_bot():
     load_dotenv()
@@ -57,18 +61,18 @@ def tel_bot():
             # Вывод списка заявок
             applications_text = ""
             try:
-                df = pd.read_excel("applications.xlsx")
+                df = pd.read_sql_table(table_name='request', con=conn)
+                df.to_excel('request.xlsx')
+                with open('request.xlsx', 'rb') as file:
+                    await bot.send_document(
+                        chat_id=message.chat.id,
+                        document=types.InputFile(file)
+                    )
+
             except FileNotFoundError:
-                print("Файл applications.xlsx не найден. Создайте файл с данными заявок.")
+                print("Файл request.xlsx не найден. Создайте файл с данными заявок.")
                 exit()
-            for index, row in df.iterrows():
-                applications_text += f"Сотрудник: {row['Сотрудник']}\n" \
-                                     f"Маршрут: {row['Маршрут']}\n" \
-                                     f"Статус: {row['Статус']}\n" \
-                                     f"Время встречи: {row['Время встречи']}\n" \
-                                     f"Место встречи: {row['Место встречи']}\n" \
-                                     f"Номер заявки: {row['Номер заявки']}\n\n"
-            await message.answer(applications_text)
+
         elif message.text == "Создать заявку на сопровождение":
             await message.answer("Введите ФИО пассажира:")
             await dp.current_state().set_state("create_application_fio")
